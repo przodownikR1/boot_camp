@@ -1,10 +1,12 @@
 package pl.java.scalatech.web;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,12 +23,14 @@ import pl.java.scalatech.repository.PersonResporitory;
 
 //@Controller  @ResponseBody
 @RestController
-@RequiredArgsConstructor(onConstructor = @__(@Autowired) )
+@RequiredArgsConstructor(onConstructor = @__(@Autowired) ) //final
 public class PersonController {
     
     private final PersonResporitory personResporitory;
  
     private final DbProp prop;
+    
+    private final MessageSource messageSource;
     
     @GetMapping(value="/persons")
     @ResponseBody
@@ -46,6 +50,11 @@ public class PersonController {
     DbProp getProperty(){
         return prop;
        
+    }
+    
+    @RequestMapping("hello")
+    String sayHello(Locale locale){
+        return messageSource.getMessage("hello", null, locale );
     }
     
     @RequestMapping("/401")
