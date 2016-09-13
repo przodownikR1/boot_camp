@@ -4,16 +4,19 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.metrics.CounterService;
-import org.springframework.boot.actuate.metrics.GaugeService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import pl.java.scalatech.component.DbProp;
 import pl.java.scalatech.domain.Person;
+import pl.java.scalatech.exception.My401Exception;
 import pl.java.scalatech.repository.PersonResporitory;
 
 //@Controller  @ResponseBody
@@ -22,10 +25,8 @@ import pl.java.scalatech.repository.PersonResporitory;
 public class PersonController {
     
     private final PersonResporitory personResporitory;
-  
-    private final CounterService counterService;
-    
-    private final GaugeService gaugeService;
+ 
+    private final DbProp prop;
     
     @GetMapping(value="/persons")
     @ResponseBody
@@ -33,12 +34,25 @@ public class PersonController {
         StopWatch sw = new StopWatch();
         sw.start();
         dupa();
-        sw.stop();
+        sw.stop();    
         
-        counterService.increment("licz_mi_person");
-        gaugeService.submit("czaswykonania", sw.getTotalTimeMillis());
         return personResporitory.findAll();
     }
+    @RequestMapping("/persons/{id}")
+    Person findById(@PathVariable Long id){
+        return personResporitory.findOne(id);
+    }
+    @RequestMapping("/prop") 
+    DbProp getProperty(){
+        return prop;
+       
+    }
+    
+    @RequestMapping("/401")
+    String generate401(){
+        throw new My401Exception();
+    }
+    
     @SneakyThrows
     private void dupa() {
         Thread.sleep(TimeUnit.SECONDS.toSeconds(3));
